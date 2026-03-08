@@ -1,10 +1,12 @@
 #!/usr/bin/env node
 import process from "node:process";
 import { createInterface } from "node:readline/promises";
+import { spawnSync } from "node:child_process";
 
 import pc from "picocolors";
 import { Command } from "commander";
 
+import { buildAgentPrompt } from "./lib/agent-prompt.js";
 import {
   findLatestDmg,
   installDependencies,
@@ -36,7 +38,7 @@ const program = new Command();
 program
   .name("appbun")
   .description("Generate an Electrobun desktop wrapper from any web app URL.")
-  .version("0.5.1");
+  .version("0.5.2");
 
 program
   .command("create")
@@ -164,6 +166,76 @@ program
     }
   });
 
+program
+  .command("prompt")
+  .argument("<url>", "web app URL to wrap")
+  .option("-n, --name <name>", "app display name")
+  .option("-o, --out-dir <dir>", "desktop wrapper output directory inside the repo")
+  .option("--title <title>", "desktop window title")
+  .option("--description <description>", "package description")
+  .option("--identifier <identifier>", "bundle identifier, for example com.example.app")
+  .option("--theme-color <hex>", "shell accent color, for example #2563eb")
+  .option("--width <number>", "window width", parseInteger, defaultOptions.width)
+  .option("--height <number>", "window height", parseInteger, defaultOptions.height)
+  .option("--copy", "copy the generated prompt to the clipboard when supported")
+  .option("--quiet", "reduce metadata logs")
+  .action(async (url: string, options: CreateCommandOptions & { copy?: boolean }) => {
+    try {
+      validatePackageManager(defaultOptions.packageManager);
+      let usedFallbackMetadata = false;
+      const metadata = await fetchSiteMetadata(url).catch((error) => {
+        usedFallbackMetadata = true;
+        if (!options.quiet) {
+          const message = error instanceof Error ? error.message : String(error);
+          console.log(pc.bold(pc.yellow("warning")), `metadata fetch failed, continuing with URL defaults`);
+          console.log(`  reason: ${message}`);
+        }
+        return createFallbackSiteMetadata(url);
+      });
+
+      const resolvedOptions = {
+        ...defaultOptions,
+        ...options,
+        packageManager: defaultOptions.packageManager,
+        install: false,
+        dmg: false,
+        yes: false,
+        showConfig: false,
+      };
+      let config = resolveAppConfig(url, resolvedOptions, metadata);
+      if (!options.outDir) {
+        config = {
+          ...config,
+          outDir: `./desktop/${config.slug}`,
+        };
+      }
+      const prompt = buildAgentPrompt(config, metadata);
+
+      if (!options.quiet) {
+        console.log(pc.bold(pc.cyan("appbun")), "agent prompt");
+        console.log(`  title: ${metadata.title ?? "(not found)"}`);
+        console.log(`  description: ${metadata.description ?? "(not found)"}`);
+        console.log(`  theme color: ${metadata.themeColor ?? "(not found)"}`);
+        console.log(`  icon candidates: ${metadata.iconCandidates.length}`);
+        console.log(`  metadata mode: ${usedFallbackMetadata ? "fallback" : "fetched"}`);
+      }
+
+      if (options.copy) {
+        copyToClipboard(prompt);
+        if (!options.quiet) {
+          console.log(pc.bold(pc.green("copied")), "agent prompt copied to clipboard");
+          console.log("");
+        }
+      }
+
+      console.log(prompt);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : String(error);
+      console.error(pc.bold(pc.red("error")), message);
+      process.exitCode = 1;
+    }
+  });
+
 program.addHelpText(
   "after",
   `
@@ -173,6 +245,7 @@ Examples:
   $ appbun create https://chat.openai.com --theme-color #10a37f --width 1600 --height 1000
   $ appbun https://chat.openai.com --name ChatGPT --dmg
   $ appbun https://github.com --name GitHub --out-dir ./github --yes
+  $ appbun prompt https://myapp.com --name "My App" --copy
 `,
 );
 
@@ -275,4 +348,27 @@ async function askForConfirmation(message: string, defaultYes: boolean): Promise
 
 function isInteractiveSession(): boolean {
   return Boolean(process.stdin.isTTY && process.stdout.isTTY);
+}
+
+function copyToClipboard(value: string): void {
+  const command =
+    process.platform === "darwin"
+      ? { bin: "pbcopy", args: [] }
+      : process.platform === "win32"
+        ? { bin: "clip", args: [] }
+        : { bin: "xclip", args: ["-selection", "clipboard"] };
+
+  const result = spawnSync(command.bin, command.args, {
+    input: value,
+    encoding: "utf8",
+    stdio: ["pipe", "ignore", "pipe"],
+    shell: process.platform === "win32",
+  });
+
+  if (result.status !== 0) {
+    const error = result.stderr?.toString().trim();
+    throw new Error(
+      `Clipboard copy failed${error ? `: ${error}` : ""}. Re-run without --copy if clipboard access is unavailable.`,
+    );
+  }
 }

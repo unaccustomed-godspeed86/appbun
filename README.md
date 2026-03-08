@@ -89,6 +89,14 @@ Skip confirmation prompts in scripted runs:
 appbun https://github.com --name "GitHub" --out-dir ./github --yes
 ```
 
+Generate a copy-paste prompt for a coding agent that is working inside your web app repo:
+
+```bash
+appbun prompt http://localhost:3000 --name "My App"
+```
+
+That outputs an instruction block telling the agent to package the current web app into `./desktop/my-app` with `appbun@latest`, then build it.
+
 ## Showcase
 
 Public no-login web apps captured with Playwright and framed to match the generated shell:

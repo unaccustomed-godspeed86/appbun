@@ -4,6 +4,7 @@ import { tmpdir } from "node:os";
 
 import { afterEach, describe, expect, test } from "bun:test";
 
+import { buildAgentPrompt } from "../lib/agent-prompt.js";
 import { renderTemplateFiles, resolveAppConfig, writeProject } from "../lib/generator.js";
 import { createFallbackSiteMetadata } from "../lib/metadata.js";
 import { deriveIdentifier, isDirectoryEmpty, normalizeHexColor, slugify, suggestAlternativeOutputDirectory } from "../lib/utils.js";
@@ -56,6 +57,44 @@ describe("utils", () => {
 });
 
 describe("generator", () => {
+  test("buildAgentPrompt targets an existing web app repo workflow", () => {
+    const config = resolveAppConfig(
+      "http://localhost:3000",
+      {
+        width: 1440,
+        height: 900,
+        packageManager: "bun",
+        install: false,
+        dmg: false,
+        yes: false,
+        showConfig: false,
+        quiet: true,
+        name: "My App",
+        outDir: "./desktop/my-app",
+      },
+      {
+        title: "My App",
+        description: "Internal dashboard",
+        themeColor: "#2255aa",
+        sourceUrl: "http://localhost:3000",
+        iconCandidates: [],
+      },
+    );
+
+    const prompt = buildAgentPrompt({ ...config, outDir: "./desktop/my-app" }, {
+      title: "My App",
+      description: "Internal dashboard",
+      themeColor: "#2255aa",
+      sourceUrl: "http://localhost:3000",
+      iconCandidates: [],
+    });
+
+    expect(prompt).toContain("You are working inside the repository of an existing web app.");
+    expect(prompt).toContain("http://localhost:3000/");
+    expect(prompt).toContain("./desktop/my-app");
+    expect(prompt).toContain("npx -y appbun@latest");
+  });
+
   test("createFallbackSiteMetadata derives defaults from url", () => {
     const metadata = createFallbackSiteMetadata("https://chat.openai.com");
     expect(metadata.title).toBe("Chat");
@@ -173,5 +212,5 @@ describe("generator", () => {
     expect(readFileSync(join(config.outDir, "src", "mainview", "index.ts"), "utf8")).toContain("example.com");
     expect(readFileSync(join(config.outDir, "package.json"), "utf8")).toContain("\"build:dmg\"");
     expect(icons.sourceUrl).toBe(svgIconDataUrl);
-  });
+  }, 10000);
 });

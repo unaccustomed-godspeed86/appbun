@@ -89,6 +89,14 @@ appbun https://www.notion.so --package-manager npm
 appbun https://github.com --name "GitHub" --out-dir ./github --yes
 ```
 
+개발 중인 웹서비스 repo에서 에이전트에게 그대로 붙여넣을 프롬프트를 만들려면:
+
+```bash
+appbun prompt http://localhost:3000 --name "My App"
+```
+
+그러면 에이전트가 현재 웹앱을 `./desktop/my-app` 아래에 `appbun@latest`로 패키징하고 빌드하게 만드는 지시문이 출력됩니다.
+
 ## Showcase
 
 로그인 없이 바로 동작하는 공개 웹앱을 Playwright로 캡처하고, 생성되는 shell 느낌에 맞춰 프레임한 예시입니다.
