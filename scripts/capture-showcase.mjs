@@ -179,7 +179,9 @@ async function captureFramedShot(app, rawPath, framedPath) {
 }
 
 async function captureGallery(capturedApps) {
-  const galleryPage = await browser.newPage({ viewport: { width: 1600, height: 1420 } });
+  const gridRows = Math.max(1, Math.ceil(capturedApps.length / 3));
+  const galleryHeight = Math.max(1420, 280 + gridRows * 420);
+  const galleryPage = await browser.newPage({ viewport: { width: 1600, height: galleryHeight } });
   const cards = await Promise.all(capturedApps.map(async (app) => {
     const buffer = await readFile(app.imagePath);
     return {

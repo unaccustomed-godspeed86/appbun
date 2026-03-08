@@ -1,15 +1,18 @@
 # Showcase
 
-These examples are current public web entry points that wrap cleanly into desktop shells.
+These examples are public web apps that work without logging in first and wrap cleanly into desktop shells.
 
 ## Included examples
 
-- ChatGPT
 - GitHub
-- Notion
-- Figma
-- Linear
-- Telegram
+- YouTube
+- YouTube Music
+- Excalidraw
+- Photopea
+- Google Maps
+- Google Translate
+- Squoosh
+- Desmos
 
 ## Refresh screenshots
 

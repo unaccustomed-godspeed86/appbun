@@ -1,50 +1,74 @@
 [
   {
-    "name": "ChatGPT",
-    "slug": "chatgpt",
-    "url": "https://chat.openai.com/",
-    "description": "AI chat workspace",
-    "command": "appbun https://chat.openai.com --name \"ChatGPT\" --dmg",
-    "accent": "#10a37f"
-  },
-  {
     "name": "GitHub",
     "slug": "github",
     "url": "https://github.com/",
-    "description": "Code hosting and review",
+    "description": "Code hosting and public repository browsing",
     "command": "appbun https://github.com --name \"GitHub\" --dmg",
     "accent": "#111827"
   },
   {
-    "name": "Notion",
-    "slug": "notion",
-    "url": "https://www.notion.so/",
-    "description": "Docs, notes, and internal wiki",
-    "command": "appbun https://www.notion.so --name \"Notion\" --dmg",
-    "accent": "#111111"
+    "name": "YouTube",
+    "slug": "youtube",
+    "url": "https://www.youtube.com/",
+    "description": "Video streaming and subscriptions",
+    "command": "appbun https://www.youtube.com --name \"YouTube\" --dmg",
+    "accent": "#dc2626"
   },
   {
-    "name": "Figma",
-    "slug": "figma",
-    "url": "https://www.figma.com/",
-    "description": "Product design and prototyping",
-    "command": "appbun https://www.figma.com --name \"Figma\" --dmg",
-    "accent": "#7c3aed"
+    "name": "YouTube Music",
+    "slug": "youtube-music",
+    "url": "https://music.youtube.com/",
+    "description": "Streaming music from the web",
+    "command": "appbun https://music.youtube.com --name \"YouTube Music\" --dmg",
+    "accent": "#ef4444"
   },
   {
-    "name": "Linear",
-    "slug": "linear",
-    "url": "https://linear.app/",
-    "description": "Issue tracking and product planning",
-    "command": "appbun https://linear.app --name \"Linear\" --dmg",
-    "accent": "#5e6ad2"
+    "name": "Excalidraw",
+    "slug": "excalidraw",
+    "url": "https://excalidraw.com/",
+    "description": "Collaborative whiteboard and sketching",
+    "command": "appbun https://excalidraw.com --name \"Excalidraw\" --dmg",
+    "accent": "#4f46e5"
   },
   {
-    "name": "Telegram",
-    "slug": "telegram",
-    "url": "https://web.telegram.org/k/",
-    "description": "Messaging from the web",
-    "command": "appbun https://web.telegram.org/k --name \"Telegram\" --dmg",
-    "accent": "#229ed9"
+    "name": "Photopea",
+    "slug": "photopea",
+    "url": "https://www.photopea.com/",
+    "description": "Browser-based image editor",
+    "command": "appbun https://www.photopea.com --name \"Photopea\" --dmg",
+    "accent": "#0f766e"
+  },
+  {
+    "name": "Google Maps",
+    "slug": "google-maps",
+    "url": "https://www.google.com/maps",
+    "description": "Maps, places, and route planning",
+    "command": "appbun https://www.google.com/maps --name \"Google Maps\" --dmg",
+    "accent": "#2563eb"
+  },
+  {
+    "name": "Google Translate",
+    "slug": "google-translate",
+    "url": "https://translate.google.com/",
+    "description": "Translation workspace",
+    "command": "appbun https://translate.google.com --name \"Google Translate\" --dmg",
+    "accent": "#2563eb"
+  },
+  {
+    "name": "Squoosh",
+    "slug": "squoosh",
+    "url": "https://squoosh.app/",
+    "description": "Image compression and conversion",
+    "command": "appbun https://squoosh.app --name \"Squoosh\" --dmg",
+    "accent": "#ea580c"
+  },
+  {
+    "name": "Desmos",
+    "slug": "desmos",
+    "url": "https://www.desmos.com/calculator",
+    "description": "Graphing calculator",
+    "command": "appbun https://www.desmos.com/calculator --name \"Desmos\" --dmg",
+    "accent": "#16a34a"
   }
 ]

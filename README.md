@@ -91,7 +91,7 @@ appbun https://github.com --name "GitHub" --out-dir ./github --yes
 
 ## Showcase
 
-Current public web entry points captured with Playwright and framed to match the generated shell:
+Public no-login web apps captured with Playwright and framed to match the generated shell:
 
 ![appbun showcase](https://raw.githubusercontent.com/bigmacfive/appbun/main/docs/screenshots/showcase-grid.png)
 
@@ -99,12 +99,15 @@ Current public web entry points captured with Playwright and framed to match the
 
 | App | URL | Command |
 | --- | --- | --- |
-| ChatGPT | `https://chat.openai.com` | `appbun https://chat.openai.com --name "ChatGPT" --dmg` |
 | GitHub | `https://github.com` | `appbun https://github.com --name "GitHub" --dmg` |
-| Notion | `https://www.notion.so` | `appbun https://www.notion.so --name "Notion" --dmg` |
-| Figma | `https://www.figma.com` | `appbun https://www.figma.com --name "Figma" --dmg` |
-| Linear | `https://linear.app` | `appbun https://linear.app --name "Linear" --dmg` |
-| Telegram | `https://web.telegram.org/k` | `appbun https://web.telegram.org/k --name "Telegram" --dmg` |
+| YouTube | `https://www.youtube.com` | `appbun https://www.youtube.com --name "YouTube" --dmg` |
+| YouTube Music | `https://music.youtube.com` | `appbun https://music.youtube.com --name "YouTube Music" --dmg` |
+| Excalidraw | `https://excalidraw.com` | `appbun https://excalidraw.com --name "Excalidraw" --dmg` |
+| Photopea | `https://www.photopea.com` | `appbun https://www.photopea.com --name "Photopea" --dmg` |
+| Google Maps | `https://www.google.com/maps` | `appbun https://www.google.com/maps --name "Google Maps" --dmg` |
+| Google Translate | `https://translate.google.com` | `appbun https://translate.google.com --name "Google Translate" --dmg` |
+| Squoosh | `https://squoosh.app` | `appbun https://squoosh.app --name "Squoosh" --dmg` |
+| Desmos | `https://www.desmos.com/calculator` | `appbun https://www.desmos.com/calculator --name "Desmos" --dmg` |
 
 More detail lives in [docs/showcase/README.md](docs/showcase/README.md).
 
