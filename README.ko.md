@@ -89,7 +89,11 @@ appbun https://www.notion.so --package-manager npm
 appbun https://github.com --name "GitHub" --out-dir ./github --yes
 ```
 
-개발 중인 웹서비스 repo에서 에이전트에게 그대로 붙여넣을 프롬프트를 만들려면:
+개발 중인 웹서비스를 에이전트가 바로 데스크톱 앱으로 빼게 하고 싶다면, 아래 정적 프롬프트를 복붙하면 됩니다:
+
+- [docs/agent-prompts/web-app-repo.ko.md](docs/agent-prompts/web-app-repo.ko.md)
+
+특정 로컬 URL 기준으로 `appbun`이 프롬프트를 미리 채워주게 하려면:
 
 ```bash
 appbun prompt http://localhost:3000 --name "My App"
