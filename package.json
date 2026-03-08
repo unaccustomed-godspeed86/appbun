@@ -1,0 +1,62 @@
+{
+  "name": "appbun",
+  "version": "0.1.0",
+  "description": "Scaffold Electrobun desktop wrappers from any web app URL.",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "appbun": "./bin/appbun.js"
+  },
+  "files": [
+    "bin",
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20.0.0",
+    "bun": ">=1.3.0"
+  },
+  "scripts": {
+    "clean": "node -e \"import('node:fs').then((fs) => fs.rmSync('dist', { recursive: true, force: true }))\"",
+    "build": "bun run clean && tsc -p tsconfig.json",
+    "check": "tsc -p tsconfig.json --noEmit",
+    "test": "bun test src",
+    "prepack": "bun run build",
+    "prepublishOnly": "bun run build",
+    "release:check": "bun run build && npm pack --dry-run"
+  },
+  "keywords": [
+    "electrobun",
+    "bun",
+    "desktop",
+    "cli",
+    "scaffold",
+    "webview",
+    "pake"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/manzi/appbun.git"
+  },
+  "homepage": "https://github.com/manzi/appbun#readme",
+  "bugs": {
+    "url": "https://github.com/manzi/appbun/issues"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "dependencies": {
+    "@resvg/resvg-js": "^2.6.2",
+    "cheerio": "^1.1.2",
+    "commander": "^14.0.1",
+    "picocolors": "^1.1.1",
+    "png-to-ico": "^2.1.8"
+  },
+  "devDependencies": {
+    "@types/bun": "^1.3.3",
+    "@types/node": "^24.6.0",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "bun@1.3.4"
+}

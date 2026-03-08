@@ -1,0 +1,21 @@
+name: Scaffold Smoke Test
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+
+jobs:
+  scaffold:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: 1.3.4
+      - run: bun install
+      - run: bun run build
+      - run: node ./bin/appbun.js https://example.com --name Example --out-dir ./tmp/example --quiet
+      - run: test -f ./tmp/example/electrobun.config.ts
+      - run: test -f ./tmp/example/assets/icon.ico
