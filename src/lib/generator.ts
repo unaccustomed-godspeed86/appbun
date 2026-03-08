@@ -157,7 +157,7 @@ function generatedPackageJson(config: ResolvedAppConfig): string {
       start: "electrobun dev",
       dev: "electrobun dev --watch",
       build: "electrobun build",
-      "build:dmg": "bun run build && node scripts/create-dmg.mjs",
+      "build:dmg": "bun run build:stable && node scripts/create-dmg.mjs",
       "build:canary": "electrobun build --env=canary",
       "build:stable": "electrobun build --env=stable"
     },
