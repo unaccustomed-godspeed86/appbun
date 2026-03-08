@@ -378,7 +378,6 @@ function generatedMainviewHtml(config: ResolvedAppConfig): string {
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>${escapeHtml(config.title)}</title>
   <link rel="stylesheet" href="index.css" />
-  <script src="views://webviewtag/index.js"></script>
   <script type="module" src="views://mainview/index.js"></script>
 </head>
 <body>
@@ -388,7 +387,7 @@ function generatedMainviewHtml(config: ResolvedAppConfig): string {
       <strong id="site-name">${escapeHtml(config.name)}</strong>
     </header>
     <main class="stage">
-      <electrobun-webview id="remote-app" class="remote-app"></electrobun-webview>
+      <div id="webview-mount" class="webview-mount"></div>
     </main>
   </div>
 </body>
@@ -463,7 +462,12 @@ body {
   inset: 0;
 }
 
-.remote-app {
+.webview-mount {
+  width: 100%;
+  height: 100%;
+}
+
+electrobun-webview {
   display: block;
   width: 100%;
   height: 100%;
@@ -482,9 +486,7 @@ body {
 
 function generatedMainviewEntry(config: ResolvedAppConfig, icons: PreparedIconAssets): string {
   const logMessage = `Loading ${config.url}${icons.sourceUrl ? ` with icon ${icons.sourceUrl}` : ""}`;
-  return `import { Electroview } from "electrobun/view";
-
-const APP_CONFIG = ${JSON.stringify({
+  return `const APP_CONFIG = ${JSON.stringify({
     name: config.name,
     title: config.title,
     origin: config.origin,
@@ -493,11 +495,7 @@ const APP_CONFIG = ${JSON.stringify({
     hasIcon: Boolean(icons.png),
     iconSource: icons.sourceUrl,
   }, null, 2)};
-
-const electroview = new Electroview();
-void electroview;
-
-const remoteApp = document.getElementById("remote-app") as HTMLElement & { src?: string };
+const mount = document.getElementById("webview-mount");
 const siteName = document.getElementById("site-name");
 const siteIcon = document.getElementById("site-icon") as HTMLImageElement | null;
 
@@ -505,8 +503,12 @@ document.title = APP_CONFIG.title;
 document.documentElement.style.setProperty("--appbun-accent", APP_CONFIG.themeColor);
 siteName && (siteName.textContent = APP_CONFIG.name);
 
-if (remoteApp) {
-  remoteApp.src = APP_CONFIG.url;
+if (mount) {
+  const webview = document.createElement("electrobun-webview");
+  webview.setAttribute("src", APP_CONFIG.url);
+  webview.setAttribute("id", "remote-app");
+  webview.classList.add("remote-app");
+  mount.appendChild(webview);
 }
 
 if (!APP_CONFIG.hasIcon && siteIcon) {
