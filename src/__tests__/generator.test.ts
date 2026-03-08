@@ -1,4 +1,4 @@
-import { mkdtempSync, readFileSync, existsSync, rmSync } from "node:fs";
+import { existsSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { join } from "node:path";
 import { tmpdir } from "node:os";
 
@@ -6,7 +6,7 @@ import { afterEach, describe, expect, test } from "bun:test";
 
 import { renderTemplateFiles, resolveAppConfig, writeProject } from "../lib/generator.js";
 import { createFallbackSiteMetadata } from "../lib/metadata.js";
-import { normalizeHexColor, deriveIdentifier, slugify } from "../lib/utils.js";
+import { deriveIdentifier, isDirectoryEmpty, normalizeHexColor, slugify, suggestAlternativeOutputDirectory } from "../lib/utils.js";
 
 const tempDirs: string[] = [];
 const svgIconDataUrl = `data:image/svg+xml,${encodeURIComponent(
@@ -39,6 +39,19 @@ describe("utils", () => {
 
   test("deriveIdentifier reverses hostname components", () => {
     expect(deriveIdentifier("https://www.linear.app", "linear-app")).toBe("app.linear.linearapp");
+  });
+
+  test("suggestAlternativeOutputDirectory appends a numeric suffix", () => {
+    const root = mkdtempSync(join(tmpdir(), "appbun-output-"));
+    tempDirs.push(root);
+    expect(suggestAlternativeOutputDirectory(root)).toBe(`${root}-2`);
+  });
+
+  test("isDirectoryEmpty ignores .DS_Store", () => {
+    const root = mkdtempSync(join(tmpdir(), "appbun-empty-"));
+    tempDirs.push(root);
+    writeFileSync(join(root, ".DS_Store"), "");
+    expect(isDirectoryEmpty(root)).toBe(true);
   });
 });
 

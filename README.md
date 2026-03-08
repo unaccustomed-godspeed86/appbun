@@ -28,6 +28,7 @@ What it handles for you:
 - generates a local Electrobun shell around the target URL
 - uses a unified top bar on macOS so the window chrome and content feel connected
 - produces cross-platform build output, plus a macOS DMG flow for drag-to-Applications installs
+- asks before destructive or heavyweight steps in interactive terminals, with `--yes` to skip prompts
 
 ## Install
 
@@ -78,6 +79,12 @@ appbun https://chat.openai.com --theme-color '#10a37f'
 
 ```bash
 appbun https://www.notion.so --package-manager npm
+```
+
+Skip confirmation prompts in scripted runs:
+
+```bash
+appbun https://github.com --name "GitHub" --out-dir ./github --yes
 ```
 
 ## Showcase

@@ -1,4 +1,4 @@
-import { existsSync, readdirSync } from "node:fs";
+import { existsSync, readdirSync, rmSync } from "node:fs";
 import { basename, resolve } from "node:path";
 
 export function slugify(input: string): string {
@@ -134,12 +134,48 @@ export function ensureSafeOutputDirectory(target: string): string {
     return resolved;
   }
 
-  const entries = readdirSync(resolved).filter((entry) => entry !== ".DS_Store");
-  if (entries.length > 0) {
+  if (!isDirectoryEmpty(resolved)) {
     throw new Error(`Refusing to write into non-empty directory: ${resolved}`);
   }
 
   return resolved;
+}
+
+export function isDirectoryEmpty(target: string): boolean {
+  const resolved = resolve(target);
+  if (!existsSync(resolved)) {
+    return true;
+  }
+
+  const entries = readdirSync(resolved).filter((entry) => entry !== ".DS_Store");
+  return entries.length === 0;
+}
+
+export function clearDirectoryContents(target: string): void {
+  const resolved = resolve(target);
+  if (!existsSync(resolved)) {
+    return;
+  }
+
+  for (const entry of readdirSync(resolved).filter((name) => name !== ".DS_Store")) {
+    rmSync(resolve(resolved, entry), { recursive: true, force: true });
+  }
+}
+
+export function suggestAlternativeOutputDirectory(target: string): string {
+  const resolved = resolve(target);
+  if (!existsSync(resolved)) {
+    return resolved;
+  }
+
+  let attempt = 2;
+  while (true) {
+    const candidate = `${resolved}-${attempt}`;
+    if (!existsSync(candidate)) {
+      return candidate;
+    }
+    attempt += 1;
+  }
 }
 
 export function prettyJson(value: unknown): string {
