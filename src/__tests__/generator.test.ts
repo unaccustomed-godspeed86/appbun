@@ -157,6 +157,63 @@ describe("generator", () => {
     expect(files.find((file) => file.path === "src/mainview/index.css")?.content).toContain("--shell-toolbar-height: 40px");
   });
 
+  test("system titlebar preset falls back to native chrome", () => {
+    const config = resolveAppConfig(
+      "https://example.com",
+      {
+        width: 1400,
+        height: 900,
+        packageManager: "bun",
+        install: false,
+        dmg: false,
+        yes: false,
+        showConfig: false,
+        quiet: true,
+        titlebar: "system",
+      },
+      {
+        title: "Example",
+        description: "Example app",
+        themeColor: "#336699",
+        sourceUrl: "https://example.com",
+        iconCandidates: [],
+      },
+    );
+
+    const files = renderTemplateFiles(config, {});
+    expect(files.find((file) => file.path === "src/bun/index.ts")?.content).toContain('titleBarStyle: isMac ? "default" : "default"');
+    expect(files.find((file) => file.path === "src/mainview/index.html")?.content).not.toContain("<header");
+    expect(files.find((file) => file.path === "src/mainview/index.css")?.content).toContain("--shell-topbar-display: none");
+  });
+
+  test("compact titlebar preset lowers toolbar height", () => {
+    const config = resolveAppConfig(
+      "https://example.com",
+      {
+        width: 1400,
+        height: 900,
+        packageManager: "bun",
+        install: false,
+        dmg: false,
+        yes: false,
+        showConfig: false,
+        quiet: true,
+        titlebar: "compact",
+      },
+      {
+        title: "Example",
+        description: "Example app",
+        themeColor: "#336699",
+        sourceUrl: "https://example.com",
+        iconCandidates: [],
+      },
+    );
+
+    const files = renderTemplateFiles(config, {});
+    expect(files.find((file) => file.path === "src/bun/index.ts")?.content).toContain('titleBarStyle: isMac ? "hiddenInset" : "default"');
+    expect(files.find((file) => file.path === "src/mainview/index.css")?.content).toContain("--shell-toolbar-height: 36px");
+  });
+
   test("writeProject creates config and icon files", async () => {
     const root = mkdtempSync(join(tmpdir(), "appbun-test-"));
     tempDirs.push(root);

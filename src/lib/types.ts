@@ -1,4 +1,5 @@
 export type PackageManager = "bun" | "npm";
+export type TitlebarStyle = "system" | "unified" | "compact" | "minimal";
 
 export type IconFormat = "png" | "svg" | "ico";
 
@@ -9,6 +10,7 @@ export interface CreateCommandOptions {
   description?: string;
   identifier?: string;
   themeColor?: string;
+  titlebar?: TitlebarStyle;
   width: number;
   height: number;
   packageManager: PackageManager;
@@ -51,6 +53,7 @@ export interface ResolvedAppConfig {
   packageName: string;
   slug: string;
   themeColor: string;
+  titlebar: TitlebarStyle;
   url: string;
   origin: string;
   outDir: string;

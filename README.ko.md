@@ -28,7 +28,7 @@ macOS, Windows, Linux를 지원합니다.
 - title, description, theme color, favicon, apple-touch-icon, manifest icon 수집
 - 깨진 응답이나 저품질 raster 아이콘을 패키징 전에 걸러냄
 - 대상 URL을 감싸는 로컬 Electrobun shell 생성
-- macOS에서 윈도우 chrome과 콘텐츠가 붙어 보이도록 통합 상단바 적용
+- macOS에서 자주 쓰는 윈도우 chrome 패턴을 프리셋으로 고를 수 있게 생성
 - macOS용 DMG 흐름 포함, 나머지 플랫폼도 빌드 가능한 출력 제공
 - interactive 터미널에서는 파괴적이거나 무거운 작업 전에 확인 프롬프트 표시, 자동 승인은 `--yes`
 
@@ -61,6 +61,12 @@ bun install
 bun run build
 ```
 
+처음부터 더 타이트한 macOS 상단바를 쓰고 싶다면:
+
+```bash
+appbun https://chat.openai.com --name "ChatGPT" --titlebar compact --dmg
+```
+
 ## CLI 예시
 
 ```bash
@@ -83,6 +89,10 @@ appbun https://chat.openai.com --theme-color '#10a37f'
 appbun https://www.notion.so --package-manager npm
 ```
 
+```bash
+appbun https://github.com --name "GitHub" --titlebar system
+```
+
 스크립트나 CI에서 확인 프롬프트를 건너뛰려면:
 
 ```bash
@@ -100,6 +110,25 @@ appbun prompt http://localhost:3000 --name "My App"
 ```
 
 그러면 에이전트가 현재 웹앱을 `./desktop/my-app` 아래에 `appbun@latest`로 패키징하고 빌드하게 만드는 지시문이 출력됩니다.
+
+## 윈도우 chrome 프리셋
+
+이제 `appbun`은 생성되는 macOS 상단바를 한 가지 스타일로 고정하지 않고, 사용자가 프리셋으로 고를 수 있게 만들었습니다.
+
+| 프리셋 | 어울리는 경우 | macOS 동작 |
+| --- | --- | --- |
+| `system` | 가장 네이티브한 창이 좋을 때 | 기본 시스템 title bar, 로컬 shell header 없음 |
+| `unified` | 기본값, 가장 균형 잡힌 wrapper | hidden inset traffic lights + 연결된 로컬 toolbar |
+| `compact` | 콘텐츠가 우선인 앱 | 같은 패턴이지만 더 낮고 더 조밀함 |
+| `minimal` | 시각적 chrome을 덜 보이고 싶을 때 | 같은 패턴이지만 메타데이터를 줄이고 경계를 약하게 표현 |
+
+Windows와 Linux에서는 현재 표준 네이티브 title bar로 폴백합니다.
+
+옵션 전체를 빨리 보려면:
+
+```bash
+appbun create --help
+```
 
 ## Showcase
 
@@ -147,16 +176,17 @@ my-app/
 
 ### macOS
 
-생성 앱은 다음을 사용합니다.
+생성 앱은 다음 중 하나를 사용합니다.
 
-- `hiddenInset` traffic lights
-- `UnifiedTitleAndToolbar`
-- 떠 있는 가짜 헤더 대신 전체 폭 로컬 title area
+- `--titlebar system`일 때 기본 시스템 title bar
+- `--titlebar unified`, `compact`, `minimal`일 때 `hiddenInset` traffic lights
+- 연결형 프리셋에서 `UnifiedTitleAndToolbar` + `FullSizeContentView`
+- 고정된 가짜 헤더 하나가 아니라 선택한 프리셋에 맞는 로컬 title area
 - 설치형 배포를 위한 `build:dmg`
 
 ### Windows 와 Linux
 
-생성된 Electrobun 프로젝트는 이미 빌드 가능합니다. 현재 `appbun`은 우선 macOS 설치 자동화에 집중하고 있고, Windows/Linux 패키징 helper는 로드맵에 있습니다.
+생성된 Electrobun 프로젝트는 이미 빌드 가능합니다. 현재 `appbun`은 이 플랫폼들에서는 표준 네이티브 title bar를 유지하고, 우선 macOS 설치 자동화에 집중하고 있습니다. Windows/Linux 패키징 helper는 로드맵에 있습니다.
 
 ## 로컬 개발
 

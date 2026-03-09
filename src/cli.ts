@@ -16,12 +16,13 @@ import {
   writeProject,
 } from "./lib/generator.js";
 import { createFallbackSiteMetadata, fetchSiteMetadata } from "./lib/metadata.js";
-import type { CreateCommandOptions } from "./lib/types.js";
+import type { CreateCommandOptions, TitlebarStyle } from "./lib/types.js";
 import { clearDirectoryContents, displayPath, isDirectoryEmpty, suggestAlternativeOutputDirectory } from "./lib/utils.js";
 
 const defaultOptions: CreateCommandOptions = {
   width: 1440,
   height: 900,
+  titlebar: "unified",
   packageManager: "bun",
   install: false,
   dmg: false,
@@ -38,6 +39,8 @@ const program = new Command();
 program
   .name("appbun")
   .description("Generate an Electrobun desktop wrapper from any web app URL.")
+  .showSuggestionAfterError()
+  .showHelpAfterError()
   .version("0.5.2");
 
 program
@@ -49,6 +52,12 @@ program
   .option("--description <description>", "package description")
   .option("--identifier <identifier>", "bundle identifier, for example com.example.app")
   .option("--theme-color <hex>", "shell accent color, for example #2563eb")
+  .option(
+    "--titlebar <style>",
+    "window chrome preset: system, unified, compact, or minimal",
+    parseTitlebar,
+    defaultOptions.titlebar,
+  )
   .option("--width <number>", "window width", parseInteger, defaultOptions.width)
   .option("--height <number>", "window height", parseInteger, defaultOptions.height)
   .option("--package-manager <pm>", "install command for the generated app: bun or npm", defaultOptions.packageManager)
@@ -57,6 +66,25 @@ program
   .option("-y, --yes", "accept interactive prompts automatically")
   .option("--show-config", "print resolved config before writing files")
   .option("--quiet", "reduce output")
+  .addHelpText(
+    "after",
+    `
+
+Titlebar presets:
+  system   Keep the default system title bar. Best for strict native chrome.
+  unified  Recommended on macOS. Hidden inset traffic lights with a connected local toolbar.
+  compact  Same macOS pattern, but tighter for content-heavy apps.
+  minimal  Same macOS pattern, with lighter metadata and less visible chrome.
+
+Examples:
+  $ appbun create https://calendar.google.com --name Calendar --out-dir ./calendar-app
+  $ appbun https://linear.app --package-manager npm --install
+  $ appbun create https://chat.openai.com --theme-color #10a37f --titlebar compact --width 1600 --height 1000
+  $ appbun https://chat.openai.com --name ChatGPT --dmg
+  $ appbun https://github.com --name GitHub --titlebar system
+  $ appbun https://github.com --name GitHub --out-dir ./github --yes
+`,
+  )
   .action(async (url: string, options: CreateCommandOptions) => {
     try {
       validatePackageManager(options.packageManager);
@@ -175,10 +203,25 @@ program
   .option("--description <description>", "package description")
   .option("--identifier <identifier>", "bundle identifier, for example com.example.app")
   .option("--theme-color <hex>", "shell accent color, for example #2563eb")
+  .option(
+    "--titlebar <style>",
+    "window chrome preset: system, unified, compact, or minimal",
+    parseTitlebar,
+    defaultOptions.titlebar,
+  )
   .option("--width <number>", "window width", parseInteger, defaultOptions.width)
   .option("--height <number>", "window height", parseInteger, defaultOptions.height)
   .option("--copy", "copy the generated prompt to the clipboard when supported")
   .option("--quiet", "reduce metadata logs")
+  .addHelpText(
+    "after",
+    `
+
+Examples:
+  $ appbun prompt http://localhost:3000 --name "My App"
+  $ appbun prompt https://staging.example.com --name "Staging App" --titlebar minimal --copy
+`,
+  )
   .action(async (url: string, options: CreateCommandOptions & { copy?: boolean }) => {
     try {
       validatePackageManager(defaultOptions.packageManager);
@@ -239,13 +282,11 @@ program
 program.addHelpText(
   "after",
   `
-Examples:
-  $ appbun create https://calendar.google.com --name Calendar --out-dir ./calendar-app
-  $ appbun https://linear.app --package-manager npm --install
-  $ appbun create https://chat.openai.com --theme-color #10a37f --width 1600 --height 1000
-  $ appbun https://chat.openai.com --name ChatGPT --dmg
-  $ appbun https://github.com --name GitHub --out-dir ./github --yes
-  $ appbun prompt https://myapp.com --name "My App" --copy
+Commands:
+  create   Scaffold a desktop wrapper project from a URL.
+  prompt   Print a ready-to-paste instruction block for another coding agent.
+
+Run "appbun <command> --help" to see examples and titlebar presets.
 `,
 );
 
@@ -257,6 +298,20 @@ function parseInteger(value: string): number {
     throw new Error(`Invalid integer: ${value}`);
   }
   return parsed;
+}
+
+function parseTitlebar(value: string): TitlebarStyle {
+  const normalized = value.trim().toLowerCase();
+  if (
+    normalized === "system" ||
+    normalized === "unified" ||
+    normalized === "compact" ||
+    normalized === "minimal"
+  ) {
+    return normalized;
+  }
+
+  throw new Error(`Invalid titlebar style: ${value}. Use system, unified, compact, or minimal.`);
 }
 
 function validatePackageManager(value: string): asserts value is "bun" | "npm" {

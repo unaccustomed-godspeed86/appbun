@@ -12,6 +12,7 @@ Inputs you must fill in before running:
 - App name: [APP_NAME]
 - Desktop wrapper output directory inside this repo: ./desktop/[APP_SLUG]
 - Window size: [WIDTH]x[HEIGHT]
+- Titlebar preset: [system|unified|compact|minimal]
 - Theme color: [THEME_COLOR]
 
 Rules:
@@ -27,7 +28,7 @@ Rules:
 Execution plan:
 1. 필요하면 현재 웹앱 dev server를 띄우고 [WEB_APP_URL]이 실제로 열리는지 확인한다.
 2. 아래 명령을 실행한다.
-   npx -y appbun@latest [WEB_APP_URL] --name "[APP_NAME]" --out-dir ./desktop/[APP_SLUG] --width [WIDTH] --height [HEIGHT] --theme-color [THEME_COLOR] --yes
+   npx -y appbun@latest [WEB_APP_URL] --name "[APP_NAME]" --out-dir ./desktop/[APP_SLUG] --titlebar [system|unified|compact|minimal] --width [WIDTH] --height [HEIGHT] --theme-color [THEME_COLOR] --yes
 3. 생성된 wrapper 디렉터리로 이동한다.
    cd ./desktop/[APP_SLUG]
 4. 의존성을 설치한다.

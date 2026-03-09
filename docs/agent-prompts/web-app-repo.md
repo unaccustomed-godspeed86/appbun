@@ -12,6 +12,7 @@ Inputs you must fill in before running:
 - App name: [APP_NAME]
 - Desktop wrapper output directory inside this repo: ./desktop/[APP_SLUG]
 - Window size: [WIDTH]x[HEIGHT]
+- Titlebar preset: [system|unified|compact|minimal]
 - Theme color: [THEME_COLOR]
 
 Rules:
@@ -27,7 +28,7 @@ Rules:
 Execution plan:
 1. If needed, start the current web app and verify [WEB_APP_URL] loads.
 2. Run:
-   npx -y appbun@latest [WEB_APP_URL] --name "[APP_NAME]" --out-dir ./desktop/[APP_SLUG] --width [WIDTH] --height [HEIGHT] --theme-color [THEME_COLOR] --yes
+   npx -y appbun@latest [WEB_APP_URL] --name "[APP_NAME]" --out-dir ./desktop/[APP_SLUG] --titlebar [system|unified|compact|minimal] --width [WIDTH] --height [HEIGHT] --theme-color [THEME_COLOR] --yes
 3. Change into the generated wrapper directory:
    cd ./desktop/[APP_SLUG]
 4. Install dependencies:

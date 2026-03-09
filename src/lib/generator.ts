@@ -9,6 +9,7 @@ import type {
   PreparedIconAssets,
   ResolvedAppConfig,
   SiteMetadata,
+  TitlebarStyle,
 } from "./types.js";
 import {
   deriveIdentifier,
@@ -40,6 +41,7 @@ export function resolveAppConfig(url: string, options: CreateCommandOptions, met
     packageName,
     slug,
     themeColor,
+    titlebar: options.titlebar ?? "unified",
     url: normalizedUrl,
     origin: new URL(normalizedUrl).origin,
     outDir,
@@ -250,8 +252,15 @@ export default {
 }
 
 function generatedBunEntry(config: ResolvedAppConfig): string {
+  const preset = getTitlebarPreset(config.titlebar);
   const startMessage = `appbun wrapper started for ${config.url}`;
   const descriptionMessage = `Description: ${config.description}`;
+  const styleMask = preset.macUsesUnifiedChrome
+    ? `{
+        UnifiedTitleAndToolbar: true,
+        FullSizeContentView: true,
+      }`
+    : "{}";
   return `import { BrowserWindow } from "electrobun/bun";
 
 const isMac = process.platform === "darwin";
@@ -265,13 +274,8 @@ const mainWindow = new BrowserWindow({
     x: 120,
     y: 120,
   },
-  titleBarStyle: isMac ? "hiddenInset" : "default",
-  styleMask: isMac
-    ? {
-        UnifiedTitleAndToolbar: true,
-        FullSizeContentView: true,
-      }
-    : {},
+  titleBarStyle: isMac ? ${JSON.stringify(preset.macTitleBarStyle)} : "default",
+  styleMask: isMac ? ${styleMask} : {},
   transparent: false,
 });
 
@@ -371,6 +375,17 @@ function scoreAppPath(pathname) {
 }
 
 function generatedMainviewHtml(config: ResolvedAppConfig): string {
+  const preset = getTitlebarPreset(config.titlebar);
+  const toolbar = preset.showCustomToolbar
+    ? `
+    <header class="topbar electrobun-webkit-app-region-drag" data-titlebar-style="${preset.id}">
+      <div class="topbar-brand">
+        <img id="site-icon" class="site-icon" src="views://mainview/icon.png" alt="" />
+        <strong id="site-name">${escapeHtml(config.name)}</strong>
+      </div>
+      <span id="site-origin" class="site-origin">${escapeHtml(new URL(config.url).hostname)}</span>
+    </header>`
+    : "";
   return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -381,14 +396,8 @@ function generatedMainviewHtml(config: ResolvedAppConfig): string {
   <script type="module" src="views://mainview/index.js"></script>
 </head>
 <body>
-  <div class="shell">
-    <header class="topbar electrobun-webkit-app-region-drag">
-      <div class="topbar-brand">
-        <img id="site-icon" class="site-icon" src="views://mainview/icon.png" alt="" />
-        <strong id="site-name">${escapeHtml(config.name)}</strong>
-      </div>
-      <span id="site-origin" class="site-origin">${escapeHtml(new URL(config.url).hostname)}</span>
-    </header>
+  <div class="shell" data-titlebar-style="${preset.id}">
+${toolbar}
     <main class="stage">
       <div id="webview-mount" class="webview-mount"></div>
     </main>
@@ -399,14 +408,18 @@ function generatedMainviewHtml(config: ResolvedAppConfig): string {
 }
 
 function generatedMainviewCss(config: ResolvedAppConfig): string {
+  const preset = getTitlebarPreset(config.titlebar);
   return `:root {
   color-scheme: light;
   --shell-ink: rgba(22, 22, 24, 0.92);
   --shell-muted: rgba(55, 65, 81, 0.72);
   --shell-border: rgba(15, 23, 42, 0.10);
   --shell-toolbar: rgba(248, 248, 250, 0.84);
-  --shell-toolbar-height: 40px;
-  --shell-toolbar-left: 78px;
+  --shell-toolbar-height: ${preset.toolbarHeight}px;
+  --shell-toolbar-left: ${preset.toolbarLeft}px;
+  --shell-topbar-display: ${preset.showCustomToolbar ? "flex" : "none"};
+  --shell-toolbar-border-alpha: ${preset.showBorder ? "1" : "0"};
+  --shell-origin-display: ${preset.showOrigin ? "block" : "none"};
 }
 
 * {
@@ -434,13 +447,13 @@ body {
   position: absolute;
   inset: 0 0 auto 0;
   height: var(--shell-toolbar-height);
-  display: flex;
+  display: var(--shell-topbar-display);
   align-items: center;
   justify-content: space-between;
   gap: 12px;
   padding: 0 16px 0 var(--shell-toolbar-left);
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), var(--shell-toolbar));
-  border-bottom: 1px solid var(--shell-border);
+  border-bottom: calc(1px * var(--shell-toolbar-border-alpha)) solid var(--shell-border);
   backdrop-filter: blur(24px) saturate(1.15);
   z-index: 2;
 }
@@ -471,6 +484,7 @@ body {
 }
 
 .site-origin {
+  display: var(--shell-origin-display);
   font-size: 11px;
   line-height: 1;
   letter-spacing: 0.01em;
@@ -482,7 +496,7 @@ body {
 
 .stage {
   position: absolute;
-  inset: var(--shell-toolbar-height) 0 0 0;
+  inset: ${preset.showCustomToolbar ? "var(--shell-toolbar-height)" : "0"} 0 0 0;
 }
 
 .webview-mount {
@@ -511,6 +525,7 @@ electrobun-webview {
 }
 
 function generatedMainviewEntry(config: ResolvedAppConfig, icons: PreparedIconAssets): string {
+  const preset = getTitlebarPreset(config.titlebar);
   const logMessage = `Loading ${config.url}${icons.sourceUrl ? ` with icon ${icons.sourceUrl}` : ""}`;
   return `const APP_CONFIG = ${JSON.stringify({
     name: config.name,
@@ -518,6 +533,8 @@ function generatedMainviewEntry(config: ResolvedAppConfig, icons: PreparedIconAs
     origin: config.origin,
     url: config.url,
     themeColor: config.themeColor,
+    titlebar: config.titlebar,
+    showOrigin: preset.showOrigin,
     hasIcon: Boolean(icons.png),
     iconSource: icons.sourceUrl,
   }, null, 2)};
@@ -525,9 +542,15 @@ const mount = document.getElementById("webview-mount");
 const siteName = document.getElementById("site-name");
 const siteOrigin = document.getElementById("site-origin");
 const siteIcon = document.getElementById("site-icon") as HTMLImageElement | null;
+const isMac = /Mac|iPhone|iPad|iPod/.test(navigator.platform);
 
 document.title = APP_CONFIG.title;
 document.documentElement.style.setProperty("--appbun-accent", APP_CONFIG.themeColor);
+document.documentElement.dataset.platform = isMac ? "mac" : "other";
+if (!isMac) {
+  document.documentElement.style.setProperty("--shell-topbar-display", "none");
+  document.documentElement.style.setProperty("--shell-toolbar-height", "0px");
+}
 siteName && (siteName.textContent = APP_CONFIG.name);
 siteOrigin && (siteOrigin.textContent = APP_CONFIG.origin.replace(/^https?:\\/\\//, ""));
 
@@ -552,6 +575,7 @@ console.log(${JSON.stringify(logMessage)});
 }
 
 function generatedReadme(config: ResolvedAppConfig, icons: PreparedIconAssets): string {
+  const preset = getTitlebarPreset(config.titlebar);
   const installCommand = config.packageManager === "bun" ? "bun install" : "npm install";
   const devCommand = config.packageManager === "bun" ? "bun run dev" : "npm run dev";
   const buildCommand = config.packageManager === "bun" ? "bun run build" : "npm run build";
@@ -576,6 +600,7 @@ ${dmgCommand}
 - Identifier: \`${config.identifier}\`
 - Source URL: [${config.url}](${config.url})
 - Theme color: \`${config.themeColor}\`
+- Titlebar preset: \`${config.titlebar}\`
 - Window size: \`${config.width}x${config.height}\`
 - Icon source: ${icons.sourceUrl ? `[${icons.sourceUrl}](${icons.sourceUrl})` : "not resolved"}
 
@@ -589,10 +614,64 @@ ${dmgCommand}
 
 ## Notes
 
-The generated app loads the remote site inside an Electrobun shell so the native window chrome and app content feel visually connected, especially on macOS with hidden inset traffic lights.
+The generated app loads the remote site inside an Electrobun shell. The selected \`${config.titlebar}\` preset currently maps to ${preset.readmeDescription}.
 
 On macOS, \`${dmgCommand}\` builds the app and wraps the newest \`.app\` bundle in a DMG that opens with the usual drag-to-Applications install flow.
 `;
+}
+
+function getTitlebarPreset(style: TitlebarStyle) {
+  switch (style) {
+    case "system":
+      return {
+        id: "system",
+        macTitleBarStyle: "default",
+        macUsesUnifiedChrome: false,
+        showCustomToolbar: false,
+        toolbarHeight: 0,
+        toolbarLeft: 0,
+        showOrigin: false,
+        showBorder: false,
+        readmeDescription: "the default system title bar on macOS and standard native chrome on other platforms",
+      } as const;
+    case "compact":
+      return {
+        id: "compact",
+        macTitleBarStyle: "hiddenInset",
+        macUsesUnifiedChrome: true,
+        showCustomToolbar: true,
+        toolbarHeight: 36,
+        toolbarLeft: 74,
+        showOrigin: true,
+        showBorder: true,
+        readmeDescription: "a tighter hidden inset macOS toolbar with connected content and standard native chrome on other platforms",
+      } as const;
+    case "minimal":
+      return {
+        id: "minimal",
+        macTitleBarStyle: "hiddenInset",
+        macUsesUnifiedChrome: true,
+        showCustomToolbar: true,
+        toolbarHeight: 34,
+        toolbarLeft: 74,
+        showOrigin: false,
+        showBorder: false,
+        readmeDescription: "a lighter hidden inset macOS toolbar with minimal metadata and standard native chrome on other platforms",
+      } as const;
+    case "unified":
+    default:
+      return {
+        id: "unified",
+        macTitleBarStyle: "hiddenInset",
+        macUsesUnifiedChrome: true,
+        showCustomToolbar: true,
+        toolbarHeight: 40,
+        toolbarLeft: 78,
+        showOrigin: true,
+        showBorder: true,
+        readmeDescription: "a hidden inset macOS toolbar with a connected local header and standard native chrome on other platforms",
+      } as const;
+  }
 }
 
 function escapeHtml(value: string): string {

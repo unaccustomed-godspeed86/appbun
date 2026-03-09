@@ -28,7 +28,7 @@ What it handles for you:
 - fetches title, description, theme color, favicon, apple-touch icon, and manifest icons
 - rejects obviously broken icon responses and low-quality raster assets before packaging
 - generates a local Electrobun shell around the target URL
-- uses a unified top bar on macOS so the window chrome and content feel connected
+- lets you choose between common macOS window chrome presets instead of hard-coding one look
 - produces cross-platform build output, plus a macOS DMG flow for drag-to-Applications installs
 - asks before destructive or heavyweight steps in interactive terminals, with `--yes` to skip prompts
 
@@ -61,6 +61,12 @@ bun install
 bun run build
 ```
 
+Need a tighter macOS chrome right away:
+
+```bash
+appbun https://chat.openai.com --name "ChatGPT" --titlebar compact --dmg
+```
+
 ## CLI examples
 
 ```bash
@@ -83,6 +89,10 @@ appbun https://chat.openai.com --theme-color '#10a37f'
 appbun https://www.notion.so --package-manager npm
 ```
 
+```bash
+appbun https://github.com --name "GitHub" --titlebar system
+```
+
 Skip confirmation prompts in scripted runs:
 
 ```bash
@@ -100,6 +110,25 @@ appbun prompt http://localhost:3000 --name "My App"
 ```
 
 That outputs a ready-to-paste instruction block telling the agent to package the current web app into `./desktop/my-app` with `appbun@latest`, then build it.
+
+## Window chrome presets
+
+`appbun` now exposes the generated macOS title area as a user choice instead of locking every app to one look.
+
+| Preset | Best for | macOS behavior |
+| --- | --- | --- |
+| `system` | strict native window chrome | default system title bar, no local shell header |
+| `unified` | default, balanced desktop wrapper | hidden inset traffic lights with a connected local toolbar |
+| `compact` | content-heavy apps | same pattern, but shorter and tighter |
+| `minimal` | distraction-free wrappers | same pattern, but lighter metadata and less visible chrome |
+
+On Windows and Linux, generated apps fall back to the standard native title bar.
+
+To inspect every option quickly:
+
+```bash
+appbun create --help
+```
 
 ## Showcase
 
@@ -147,16 +176,17 @@ my-app/
 
 ### macOS
 
-Generated apps use:
+Generated apps can use:
 
-- `hiddenInset` traffic lights
-- `UnifiedTitleAndToolbar`
-- a full-width local title area instead of a floating fake header
+- the default system title bar with `--titlebar system`
+- `hiddenInset` traffic lights with `--titlebar unified`, `compact`, or `minimal`
+- `UnifiedTitleAndToolbar` plus `FullSizeContentView` for the connected presets
+- a local title area sized to match the selected preset instead of one fixed fake header
 - `build:dmg` for installer-style distribution
 
 ### Windows and Linux
 
-The generated Electrobun project is already buildable there. `appbun` currently focuses its installer automation on macOS first; Windows and Linux packaging helpers are still on the roadmap.
+The generated Electrobun project is already buildable there. `appbun` keeps the standard native title bar on those platforms today and focuses its installer automation on macOS first; Windows and Linux packaging helpers are still on the roadmap.
 
 ## Local development
 
